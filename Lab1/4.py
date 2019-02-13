@@ -5,10 +5,6 @@ string = input("Please enter a string:\n")
 best_chars = [string[0]]
 # Variable to hold the current substring
 current_chars = [string[0]]
-# Variable to hold the index of the first character in the current string
-first = 0
-# Variable to hold the index of the last character in the current string
-last = 0
 # Initially the first character is already selected for the best substring
 current_length = 1
 best_length = 1
@@ -19,7 +15,6 @@ for i in range(1, len(string)):
     if string[i] not in current_chars:
         current_length += 1
         current_chars.append(string[i])
-        last = i
     # If next character is in current, update the best substring if necessary
     else:
         if current_length > best_length:
@@ -29,11 +24,9 @@ for i in range(1, len(string)):
         while string[i] in current_chars:
             current_chars = current_chars[1:]
             current_length -= 1
-            first += 1
         # Finally add the current character to the substring and increase length
         current_chars.append(string[i])
         current_length += 1
-        last = i
 
 # Convert list of chars to a string
 best_string = ""
