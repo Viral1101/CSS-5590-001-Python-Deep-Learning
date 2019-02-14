@@ -18,5 +18,6 @@ for entry in tuple_list:
     # If name is already in dictionary, add the new score to the value
     else:
         dictionary[entry[0]].append(entry[1])
+        dictionary[entry[0]].sort()
 
 print(dictionary)
