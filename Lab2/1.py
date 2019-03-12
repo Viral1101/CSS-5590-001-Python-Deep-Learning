@@ -14,7 +14,7 @@ target = data['income']
 
 # Perform exploratory data analysis on the data set
 # Handle null values
-nulls = pd.DataFrame(data.isnull().sum().sort_values(ascending=False)[:25])
+nulls = pd.DataFrame(data.isnull().sum().sort_values(ascending=False))
 nulls.columns = ['Null Count']
 nulls.index.name = 'Feature'
 print(nulls)
