@@ -19,7 +19,7 @@ print(train.isna().sum())
 
 # Split the data into x (age, bmi, avg glucose level) and y (stroke)
 x = train.iloc[:,[2,8,9]]
-y = train.iloc[:-1]
+# y = train.iloc[:-1]
 
 # Scatter plot the data and color the points where a stroke was noted
 sns.FacetGrid(train, hue='stroke', height=4).map(plt.scatter, 'age', 'bmi', 'avg_glucose_level')
