@@ -25,8 +25,56 @@ plt.show()
 ![Stroke is orange](https://github.com/Viral1101/CSS-5590-001-Python-Deep-Learning/blob/master/Lab2/Documentation/kmeans_2D.png)
 
 We can similarly plot in 3-dimensions. Here, stroke is indicated by yellow.
+```python
+fig = plt.figure()
+ax = Axes3D(fig)
+ax.scatter(x.age, x.bmi, x.avg_glucose_level, c=train['stroke'])
+plt.show()
+```
 ![Stroke is yellow](https://github.com/Viral1101/CSS-5590-001-Python-Deep-Learning/blob/master/Lab2/Documentation/kmeans_3D.png)
 
-Since the data points positive for stroke appear to exist in a cluster, it may be useful to cluster on these traits to identify a risk category.
+Since the data points positive for stroke appear to exist in a cluster, it may be useful to cluster on these traits to identify a risk category. To accomplish this, the x-variables need to be scaled, a k is chosen, a seed is set for repeatability, and the model is fit.
+
+```python
+scaler = preprocessing.StandardScaler()
+scaler.fit(x)
+x_scaled_array = scaler.transform(x)
+x_scaled = pd.DataFrame(x_scaled_array, columns=x.columns)
+
+nclusters = 2
+seed = 0
+km = KMeans(n_clusters=nclusters, random_state=seed)
+km.fit(x_scaled)
+```
+Next, the clusters are predicted from the data and converted to a dataframe to plot.
+```python
+y_cluster = km.predict(x_scaled)
+ys = pd.DataFrame(y_cluster)
+
+fig = plt.figure()
+ax = Axes3D(fig)
+ax.scatter(x.age, x.bmi, x.avg_glucose_level, c=ys[0])
+plt.show()
+```
+![k = 2](https://github.com/Viral1101/CSS-5590-001-Python-Deep-Learning/blob/master/Lab2/Documentation/kmeans_clusters_k2_3D.png)
+
+Finally, the chosen K is evaluated using an elbow plot and silhouette score.
+```python
+wcss = []
+for i in range(1,11):
+    kmeans = KMeans(n_clusters=i, init='k-means++', max_iter=300, n_init=10, random_state=0)
+    kmeans.fit(x)
+    wcss.append(kmeans.inertia_)
+plt.plot(range(1, 11), wcss)
+plt.show()
+
+print(silhouette_score(x, y_cluster))
+```
+![Elbow plot](https://github.com/Viral1101/CSS-5590-001-Python-Deep-Learning/blob/master/Lab2/Documentation/kmeans_elbow.png)
+### Model evaluation
+The elbow plot indicates that the ideal K would be 2. The silhouette score for a k of 2 is `0.19910761377088917`, which indicates there isn't much distinction between the clusters; the plot confirms this score.
+
+A K of 3 may be more justified, the benefits, according to the elbow plot, aren't as great as 2. Modeling in this manner results in a slightly more convoluted plot, and a silhouette score of `0.3385716824438738`. Since this isn't much of an improvement, and 2 clusters is more intuitive, the correct k is 2.
+![K=3](https://github.com/Viral1101/CSS-5590-001-Python-Deep-Learning/blob/master/Lab2/Documentation/kmeans_clusters_3D.png)
 ## NLP
 ## Regression
