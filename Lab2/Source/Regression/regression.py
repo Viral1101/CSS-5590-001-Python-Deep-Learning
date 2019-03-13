@@ -52,6 +52,8 @@ x_temp = pd.concat([x, x2], axis=1)
 clf_pre = linear_model.LinearRegression()
 clf_pre.fit(x_temp, y)
 
+print("Skew is: ", x.skew())
+
 # Remove data points that are >= 2 standard deviations from the mean
 y = y[x < 2*x_std + x_avg]
 x2 = x2[x < 2*x_std + x_avg]
@@ -72,6 +74,7 @@ plt.ylabel('NOx')
 plt.title('NOx by S3 concentration')
 plt.show()
 
+print("Skew is: ", x2.skew())
 # Log10 transform the x2 coordinate to make it more linear
 x2 = np.log10(x2)
 
