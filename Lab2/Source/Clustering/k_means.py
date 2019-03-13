@@ -40,7 +40,7 @@ x_scaled_array = scaler.transform(x)
 x_scaled = pd.DataFrame(x_scaled_array, columns=x.columns)
 
 # Perform kmeans clustering on the scaled x-data
-nclusters = 2
+nclusters = 3
 seed = 0
 km = KMeans(n_clusters=nclusters, random_state=seed)
 km.fit(x_scaled)

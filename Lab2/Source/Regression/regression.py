@@ -26,9 +26,9 @@ data = data.dropna()
 train, test = train_test_split(data, test_size=0.33, random_state=42)
 
 # Plot histograms to identify columns aproximating a normal distribution
-# for col in data.columns:
-#     plt.hist(data[col], color='blue')
-#     plt.show()
+for col in data.columns:
+    plt.hist(data[col], color='blue')
+    plt.show()
 
 # This data set, evidently uses negative numbers to represent missing data
 y = train.NOx[train.S1 > 0]
