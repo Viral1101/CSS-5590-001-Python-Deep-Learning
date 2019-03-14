@@ -4,6 +4,60 @@ The second lab assignment makes use of various machine learning techniques such 
 
 Josh Reeves prepared the classification and NLP sections. Clustering and regression were performed by Dave Walsh.
 ## Classification
+### Objective
+Using a dataset, perform preprocessing on the data and fit the data using KNN, SVM, and Naive Bayes models.
+### Data
+Data for classification was taken from the UCI Machine Learning Repository, predicting if a given person's income is above or below $50,000 based on their census data. [Census Income Prediction](http://archive.ics.uci.edu/ml/datasets/Adult)
+### Approach
+First, the data is read into a dataframe and separated into features and target. 
+```python
+data = pd.read_table('adult.data', delimiter=', ')
+features = data.drop('income', axis=1)
+target = data['income']
+```
+Next, the data needs to be examined for preprocessing. Firstly, the data is checked for null values. None are found in this specific set, so no action is necessary to change nulls.
+```python
+nulls = pd.DataFrame(data.isnull().sum().sort_values(ascending=False))
+nulls.columns = ['Null Count']
+nulls.index.name = 'Feature'
+print(nulls)
+```
+Next, all categorical features are encoded to be used in the fitting.
+```python
+data = data.apply(LabelEncoder().fit_transform)
+features = features.apply(LabelEncoder().fit_transform)
+```
+Third, the correlation of all features against the target is printed, and features will very low correlation are removed.
+```python
+corr = data.corr()
+print(corr['income'].sort_values(ascending=False), '\n')
+features = features.drop(['relationship','marital-status','fnlwgt'], axis=1)
+```
+Lastly, the features are scaled to help with SVM convergence.
+```python
+features = scale(features)
+```
+Finally, the data is split into a training and validation set, and fit to each model. After each model completes fitting the data, the accuracy is printed.
+```python
+x_train, x_test, y_train, y_test = train_test_split(features, target)
+
+bayes = GaussianNB()
+bayes.fit(x_train, y_train)
+bayes_accuracy = bayes.score(x_test, y_test)
+print("Accuracy of Naive Bayes: ", bayes_accuracy)
+
+svm = SVC(kernel='linear', C=1)
+svm.fit(x_train, y_train)
+svm_accuracy = svm.score(x_test, y_test)
+print("Accuracy of Support Vector Machines: ", svm_accuracy)
+
+knn = KNeighborsClassifier()
+knn.fit(x_train, y_train)
+knn_accuracy = knn.score(x_test, y_test)
+print("Accuracy of K Nearest Neighbors: ", knn_accuracy)
+```
+### Model evaluation
+The KNN model consistently was slightly better than the other models, usually scoring at about 83% accuracy. All models stayed at about 80% accuracy consistently.
 ## Clustering
 ### Objective
 Using an obtained dataset, perform k-means clustering, visualize the data, and demonstrate why a particular K was chosen.
@@ -77,6 +131,66 @@ The elbow plot indicates that the ideal K would be 2. The silhouette score for a
 A K of 3 may be more justified, the benefits, according to the elbow plot, aren't as great as 2. Modeling in this manner results in a slightly more convoluted plot, and a silhouette score of `0.3385716824438738`. Since this isn't much of an improvement, and 2 clusters is more intuitive, the correct k is 2.
 ![K=3](https://github.com/Viral1101/CSS-5590-001-Python-Deep-Learning/blob/master/Lab2/Documentation/kmeans_clusters_3D.png)
 ## NLP
+### Objective
+Given an input file, summarize the text by finding the 10 most repeated trigrams and concatenating each sentence that includes them.
+### Data
+The data for natural language processing was included with the prompt.
+[Text Sample](https://umkc.box.com/s/7by0f4540cdbdp3pm60h5fxxffefsvrw)
+### Approach
+First, the data is read from file and saved into a single string. 
+```python
+infile = open('nlp_input.txt')
+data = infile.read()
+```
+Next, the string is tokenized by word and lemmatized.
+```python
+lemma_list = list()
+words = nltk.word_tokenize(data)
+lemmatizer = nltk.stem.WordNetLemmatizer()
+for word in words:
+    lemma = lemmatizer.lemmatize(word)
+    lemma_list.append(lemma)
+print(lemma_list, '\n')
+```
+Next, the top ten trigrams are needed. To do this, each trigram is used as a key in a dictionary where the associated value is the count of the trigram. Then iterate ten times through the key values to find the top ten repeated trigrams.
+```python
+trigrams = nltk.trigrams(words)
+trigram_dict = dict()
+for trigram in trigrams:
+    if trigram not in trigram_dict.keys():
+        trigram_dict[trigram] = 1
+    else:
+        trigram_dict[trigram] += 1
+
+top_10_list = list()
+for i in range(0,10):
+    max_count = 0
+    max_trigram = 0
+    for trigram in trigram_dict.keys():
+        if trigram_dict[trigram] > max_count:
+            max_count = trigram_dict[trigram]
+            max_trigram = trigram
+            trigram_dict[trigram] = 0
+    top_10_list.append(max_trigram)
+
+print('\n', top_10_list, '\n')
+```
+Lastly, tokenize the data by sentences and iterate through each sentence, and tokenize each sentence token by words. If one of the top ten trigrams is found in the trigram list of the sentence token, it is included in the concatenated list. 
+```python
+concatenated = ''
+sentences = nltk.sent_tokenize(data)
+for sentence in sentences:
+    sentence_words = nltk.word_tokenize(sentence)
+    sentence_trigrams = nltk.trigrams(sentence_words)
+    found = False
+    for trigram in sentence_trigrams:
+        if trigram in top_10_list:
+            found = True
+    if found:
+        concatenated += sentence
+```
+### Model evaluation
+The model works as it is supposed to, however due to some apparent errors in the input text file, the summary doesn't appear totally coherent. 
 ## Regression
 ### Objective
 Perform a multiple regression on a new dataset and evaluate the model with R² and RMSE.
