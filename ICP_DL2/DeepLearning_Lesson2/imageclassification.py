@@ -3,6 +3,7 @@ from keras.datasets import mnist
 import numpy as np
 import matplotlib.pyplot as plt
 from keras.layers import Dense
+from keras.layers import Dropout
 from keras.utils import to_categorical
 
 plt.style.use(style='ggplot')
@@ -33,8 +34,11 @@ test_labels_one_hot = to_categorical(test_labels)
 #creating network
 model = Sequential()
 model.add(Dense(512, activation='sigmoid', input_shape=(dimData,)))
+model.add(Dropout(0.8))
 model.add(Dense(512, activation='sigmoid'))
+model.add(Dropout(0.8))
 model.add(Dense(512, activation='sigmoid'))
+model.add(Dropout(0.8))
 model.add(Dense(10, activation='softmax'))
 
 model.compile(optimizer='rmsprop', loss='categorical_crossentropy', metrics=['accuracy'])
