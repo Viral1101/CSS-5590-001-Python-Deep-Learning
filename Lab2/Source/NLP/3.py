@@ -1,7 +1,7 @@
 import nltk
 
 # Read the data from a file
-infile = open('nlp_input.txt')
+infile = open('C:/Users/Dave/Documents/GitHub/CSS-5590-001-Python-Deep-Learning/Lab2/Source/NLP/nlp_input.txt')
 data = infile.read()
 
 # Tokenize the text into words and apply lemmatization technique on each word

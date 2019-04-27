@@ -13,25 +13,25 @@ import re
 
 from sklearn.preprocessing import LabelEncoder
 
-data = pd.read_csv('spam.csv', encoding="latin1")
+data = pd.read_csv('Sentiment.csv', encoding="latin1")
 # Keeping only the neccessary columns
-data = data[['v2','v1']]
-# data = data[data.v1 != 'Neutral']
-#
-# data = data[data.v1 != "Neutral"]
-data['v2'] = data['v2'].apply(lambda x: x.lower())
-data['v2'] = data['v2'].apply((lambda x: re.sub('[^a-zA-z0-9\s]', '', x)))
+data = data[['text','sentiment']]
+data = data[data.sentiment != 'Neutral']
 
-print(data[data['v1'] == 'ham'].size)
-print(data[data['v1'] == 'spam'].size)
+data = data[data.sentiment != "Neutral"]
+data['text'] = data['text'].apply(lambda x: x.lower())
+data['text'] = data['text'].apply((lambda x: re.sub('[^a-zA-z0-9\s]', '', x)))
+
+print(data[data['sentiment'] == 'Positive'].size)
+print(data[data['sentiment'] == 'Negative'].size)
 
 for idx, row in data.iterrows():
     row[0] = row[0].replace('rt', ' ')
 
 max_fatures = 2000
 tokenizer = Tokenizer(num_words=max_fatures, split=' ')
-tokenizer.fit_on_texts(data['v2'].values)
-X = tokenizer.texts_to_sequences(data['v2'].values)
+tokenizer.fit_on_texts(data['text'].values)
+X = tokenizer.texts_to_sequences(data['text'].values)
 print(X)
 X = pad_sequences(X)
 print(X)
@@ -48,7 +48,7 @@ def createmodel():
 # print(model.summary())
 
 labelencoder = LabelEncoder()
-integer_encoded = labelencoder.fit_transform(data['v1'])
+integer_encoded = labelencoder.fit_transform(data['sentiment'])
 y = to_categorical(integer_encoded)
 X_train, X_test, Y_train, Y_test = train_test_split(X,y, test_size = 0.33, random_state = 42)
 print(X_train.shape,Y_train.shape)
@@ -64,18 +64,18 @@ batch_size = [30, 40]
 epochs = [1, 2]
 param_grid= dict(batch_size=batch_size, epochs=epochs)
 from sklearn.model_selection import GridSearchCV
-grid = GridSearchCV(estimator=model, param_grid=param_grid, n_jobs=-1)
+grid = GridSearchCV(estimator=model, param_grid=param_grid, n_jobs=1)
 grid_result = grid.fit(X_train, Y_train)
 # summarize results
 print("Best: %f using %s" % (grid_result.best_score_, grid_result.best_params_))
 
-# model = createmodel()
-# model.fit(X_train, Y_train, epochs = grid_result.best_score_, batch_size=grid_result.best_params_, verbose = 2)
-# score,acc = model.evaluate(X_test,Y_test,verbose=2,batch_size=grid_result.best_params_)
-# print(score)
-# print(acc)
+model2 = createmodel()
+model2.fit(X_train, Y_train, epochs = grid_result.best_params_['epochs'], batch_size=grid_result.best_params_['batch_size'], verbose = 2)
+score,acc = model2.evaluate(X_test,Y_test,verbose=2,batch_size=grid_result.best_params_['batch_size'])
+print(score)
+print(acc)
 
-model.save('./model' + '.h5')
+# model.save('./model' + '.h5')
 
 
 text = "A lot of good things are happening. We are respected again throughout the world, and that's a great thing."
@@ -92,7 +92,7 @@ X = tokenizer.texts_to_sequences(text)
 print(X)
 X = pad_sequences(X, maxlen=28)
 
-result = model.predict_classes(X)
+result = model2.predict_classes(X)
 
 # labelencoder = LabelEncoder()
 # integer_encoded = labelencoder.fit_transform(data['sentiment'])
