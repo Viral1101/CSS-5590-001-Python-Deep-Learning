@@ -72,6 +72,7 @@ def create_model():
 # print(acc)
 
 # model.save('./model2' + '.h5')
+#
 
 model2 = KerasClassifier(build_fn=create_model)
 epochs2 = [1, 2, 3]
