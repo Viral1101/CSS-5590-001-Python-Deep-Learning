@@ -91,8 +91,8 @@ model = create_model()
 
 model2 = KerasClassifier(build_fn=create_model)
 
-epochs2 = [1, 2, 3]
-batch2 = [10, 20, 30]
+epochs2 = [10, 15]
+batch2 = [30, 50, 100]
 param_grid = dict(batch_size=batch2, epochs=epochs2)
 from sklearn.model_selection import GridSearchCV
 grid = GridSearchCV(estimator=model2, param_grid=param_grid, n_jobs=-1)
