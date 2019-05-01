@@ -26,9 +26,11 @@ tbCallBack = keras.callbacks.TensorBoard(log_dir='./Graph', histogram_freq=0, wr
 seed = 42
 numpy.random.seed(seed)
 
+#Read data set in
 train = pd.read_csv('./train.tsv', delimiter='\t', encoding='utf-8')
 test = pd.read_csv('./test.tsv', delimiter='\t', encoding='utf-8')
 
+#Text preprocessing
 train = train[['Phrase', 'Sentiment']]
 test = test[['Phrase']]
 
@@ -48,6 +50,7 @@ X2 = pad_sequences(X2, maxlen=len(X[0]))
 print(len(X[0]))
 print(len(X2[0]))
 
+#Encode the results
 labelencoder = LabelEncoder()
 integer_encoded = labelencoder.fit_transform(train['Sentiment'])
 y_train = to_categorical(integer_encoded)
@@ -66,6 +69,7 @@ batch = 30
 lrate = 0.01
 decay = lrate/epochs
 
+#Construct the model
 def create_model():
     sgd = SGD(lr=lrate, momentum=0.9, decay=decay, nesterov=False)
     model = Sequential()
@@ -82,13 +86,14 @@ def create_model():
 
 model = create_model()
 
+# CNN model
 #
 # model.fit(X_train, Y_train, validation_data=(X_test, Y_test), epochs=epochs, batch_size=batch, callbacks=[tbCallBack])
-# # Final evaluation of the model
 # scores = model.evaluate(X_test, Y_test, verbose=1)
 # print("Accuracy: %.2f%%" % (scores[1]*100))
 # model.save('./model' + '.h5')
 
+# CNN GridSearch tuning
 model2 = KerasClassifier(build_fn=create_model)
 
 epochs2 = [10, 15]
@@ -97,5 +102,4 @@ param_grid = dict(batch_size=batch2, epochs=epochs2)
 from sklearn.model_selection import GridSearchCV
 grid = GridSearchCV(estimator=model2, param_grid=param_grid, n_jobs=-1)
 grid_result = grid.fit(X_train, Y_train)
-# summarize results
 print("Best: %f using %s" % (grid_result.best_score_, grid_result.best_params_))
