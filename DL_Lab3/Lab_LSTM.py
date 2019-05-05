@@ -19,6 +19,7 @@ tbCallBack = TensorBoard(log_dir='./Graph', histogram_freq=0, write_graph=True, 
 seed = 42
 np.random.seed(seed)
 
+# Read in the text data and preprocessing
 train = pd.read_csv('./train.tsv', delimiter='\t', encoding='utf-8')
 test = pd.read_csv('./test.tsv', delimiter='\t', encoding='utf-8')
 
@@ -41,6 +42,7 @@ X2 = pad_sequences(X2, maxlen=len(X[0]))
 print(len(X[0]))
 print(len(X2[0]))
 
+# Encode the output categories
 label_encoder = LabelEncoder()
 integer_encoded = label_encoder.fit_transform(train['Sentiment'])
 y_train = to_categorical(integer_encoded)
@@ -55,7 +57,7 @@ batch = 30
 embed_dim = 128
 lstm_out = 196
 
-
+# Construct the model
 def create_model():
     model = Sequential()
     model.add(Embedding(max_features, embed_dim,input_length = X.shape[1]))
@@ -65,7 +67,7 @@ def create_model():
     model.compile(loss = 'categorical_crossentropy', optimizer='adam',metrics = ['accuracy'])
     return model
 
-
+# LSTM model building
 # model.fit(X_train, Y_train, epochs = epochs, batch_size=batch, verbose = 1)
 # score,acc = model.evaluate(X_test,Y_test,verbose=2,batch_size=batch)
 # print(score)
@@ -74,6 +76,7 @@ def create_model():
 # model.save('./model2' + '.h5')
 #
 
+#LSTM model tuning
 model2 = KerasClassifier(build_fn=create_model)
 epochs2 = [5, 10]
 batch2 = [200, 300]
@@ -81,5 +84,4 @@ param_grid = dict(batch_size=batch2, epochs=epochs2)
 from sklearn.model_selection import GridSearchCV
 grid = GridSearchCV(estimator=model2, param_grid=param_grid, n_jobs=1)
 grid_result = grid.fit(X_train, Y_train)
-# summarize results
 print("Best: %f using %s" % (grid_result.best_score_, grid_result.best_params_))
