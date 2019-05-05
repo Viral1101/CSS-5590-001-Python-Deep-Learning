@@ -75,11 +75,11 @@ def create_model():
 #
 
 model2 = KerasClassifier(build_fn=create_model)
-epochs2 = [10, 15]
-batch2 = [30, 50, 100]
+epochs2 = [5, 10]
+batch2 = [200, 300]
 param_grid = dict(batch_size=batch2, epochs=epochs2)
 from sklearn.model_selection import GridSearchCV
-grid = GridSearchCV(estimator=model2, param_grid=param_grid, n_jobs=-1)
+grid = GridSearchCV(estimator=model2, param_grid=param_grid, n_jobs=1)
 grid_result = grid.fit(X_train, Y_train)
 # summarize results
 print("Best: %f using %s" % (grid_result.best_score_, grid_result.best_params_))

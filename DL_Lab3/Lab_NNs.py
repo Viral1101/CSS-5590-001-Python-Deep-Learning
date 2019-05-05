@@ -62,7 +62,7 @@ embed_dim = 128
 print(X_train.shape[1])
 
 epochs = 10
-batch = 30
+batch = 100
 lrate = 0.01
 decay = lrate/epochs
 
@@ -70,11 +70,13 @@ def create_model():
     sgd = SGD(lr=lrate, momentum=0.9, decay=decay, nesterov=False)
     model = Sequential()
     model.add(Embedding(max_features, embed_dim, input_length=X_train.shape[1]))
-    model.add(Conv1D(128, kernel_size=5, activation='relu', kernel_constraint=maxnorm(3)))
+    model.add(Conv1D(128, kernel_size=1, activation='relu'))
     model.add(MaxPooling1D())
-    model.add(Conv1D(128, kernel_size=5, activation='relu', kernel_constraint=maxnorm(3)))
+    model.add(Conv1D(256, kernel_size=1, activation='relu'))
     model.add(MaxPooling1D())
     model.add(Flatten())
+    model.add(Dense(512, activation='relu'))
+    model.add(Dense(128, activation='relu'))
     model.add(Dense(num_classes, activation='softmax'))
     model.compile(loss='categorical_crossentropy', optimizer=sgd, metrics=['accuracy'])
     return model
@@ -83,19 +85,19 @@ def create_model():
 model = create_model()
 
 #
-# model.fit(X_train, Y_train, validation_data=(X_test, Y_test), epochs=epochs, batch_size=batch, callbacks=[tbCallBack])
-# # Final evaluation of the model
-# scores = model.evaluate(X_test, Y_test, verbose=1)
-# print("Accuracy: %.2f%%" % (scores[1]*100))
+model.fit(X_train, Y_train, validation_data=(X_test, Y_test), epochs=epochs, batch_size=batch, callbacks=[tbCallBack])
+# Final evaluation of the model
+scores = model.evaluate(X_test, Y_test, verbose=1)
+print("Accuracy: %.2f%%" % (scores[1]*100))
 # model.save('./model' + '.h5')
 
-model2 = KerasClassifier(build_fn=create_model)
-
-epochs2 = [10, 15]
-batch2 = [30, 50, 100]
-param_grid = dict(batch_size=batch2, epochs=epochs2)
-from sklearn.model_selection import GridSearchCV
-grid = GridSearchCV(estimator=model2, param_grid=param_grid, n_jobs=-1)
-grid_result = grid.fit(X_train, Y_train)
-# summarize results
-print("Best: %f using %s" % (grid_result.best_score_, grid_result.best_params_))
+# model2 = KerasClassifier(build_fn=create_model)
+#
+# epochs2 = [10, 15]
+# batch2 = [30, 50, 100]
+# param_grid = dict(batch_size=batch2, epochs=epochs2)
+# from sklearn.model_selection import GridSearchCV
+# grid = GridSearchCV(estimator=model2, param_grid=param_grid, n_jobs=-1)
+# grid_result = grid.fit(X_train, Y_train)
+# # summarize results
+# print("Best: %f using %s" % (grid_result.best_score_, grid_result.best_params_))
